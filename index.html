@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICT Quiz 2026</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body { background:#f2f6ff; }
+h1,h2 { color:#003366; text-align:center; margin-top:20px; }
+.result, .admin-table { margin-top:20px; }
+button { margin-top:10px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>ICT Quiz 2026</h1>
+
+<div class="mb-3">
+<label>নাম:</label>
+<input type="text" class="form-control" id="name" required>
+</div>
+<div class="mb-3">
+<label>রোল নম্বর:</label>
+<input type="text" class="form-control" id="roll" required>
+</div>
+<div class="mb-3">
+<label>বিভাগ:</label>
+<input type="text" class="form-control" id="dept" required>
+</div>
+
+<form id="quizForm"></form>
+
+<button class="btn btn-primary" onclick="checkResult()">Submit Quiz</button>
+<button class="btn btn-secondary" onclick="showAdminPanel()">Admin Panel</button>
+
+<div id="output"></div>
+<div id="admin" class="mt-3"></div>
+</div>
+
+<script>
+const questions = [
+["কম্পিউটার শব্দের অর্থ কি?",["কথা বলার যন্ত্র","গণনা করার যন্ত্র","গান শোনার যন্ত্র","ছবি দেখার যন্ত্র"],1],
+["আধুনিক কম্পিউটারের জনক কে?",["স্টিভ জবস","বিল গেটস","চার্লস ব্যাবেজ","হাওয়ার্ড এ্যাইকিন"],2],
+["কম্পিউটারের স্মৃতি প্রধানত কত প্রকার?",["দুই","তিন","চার","পাঁচ"],0],
+["LCD এর পূর্ণরূপ?",["Liquid Common Display","Liquid Crystal Display","Local Crystal Display","Light Crystal Display"],1],
+["PC বলতে কী বোঝায়?",["Public","Private","Personal","Power"],2],
+["CPU এর পূর্ণরূপ?",["Central Processing Unit","Central Program Unit","Control Processing Unit","Common Processing Unit"],0],
+["1 KB সমান কত বাইট?",["500","1000","1024","1056"],2],
+["কম্পিউটারের আবিষ্কারক?",["জন ভন নিউম্যান","হাওয়ার্ড এ্যাইকিন","মার্ক জুকারবার্গ","ল্যারি পেজ"],1],
+["Permanent Memory কোনটি?",["RAM","ROM","Hard Disk","Cache"],1],
+["কম্পিউটারের নিজস্ব কোনটি নেই?",["ক্ষমতা","সংরক্ষণ","বুদ্ধি","বিদ্যুৎ"],2],
+["YouTube এর প্রতিষ্ঠাতা?",["চ্যাল ও করিম","জুকারবার্গ","ল্যারি পেজ","এলন মাস্ক"],0],
+["সব কার্যক্রম নিয়ন্ত্রণ করে?",["মনিটর","মাউস","কিবোর্ড","CPU"],3],
+["E-mail অর্থ?",["ইলেকট্রিক","ইলেকট্রনিক","ইজি","ইমারজেন্সি"],1],
+["কম্পিউটারের ব্রেইন?",["কিবোর্ড","মাদারবোর্ড","মাইক্রো প্রসেসর","হার্ডওয়্যার"],2],
+["ভৌত যন্ত্রাংশ?",["সফটওয়্যার","হার্ডওয়্যার","OS","ফাইল"],1],
+["কম্পিউটার কিংবদন্তি?",["স্টিভ জবস","বিল গেটস","জেফ বেজোস","ল্যারি পেজ"],1],
+["BIOS পূর্ণরূপ?",["Binary","Basic Input-Output","Business","Basic Inner"],1],
+["প্রধান সার্কিট বোর্ড?",["হার্ডডিস্ক","সাউন্ড","মাদারবোর্ড","গ্রাফিক্স"],2],
+["RAM কী?",["OS","স্থায়ী","অস্থায়ী","আউটপুট"],2],
+["কম্পিউটার পদ্ধতির অঙ্গ?",["মাউস-কিবোর্ড","মনিটর-প্রিন্টার","হার্ডওয়্যার-সফটওয়্যার","স্ক্যানার-স্পিকার"],2]
+];
+
+// Questions HTML তৈরি
+const quizForm = document.getElementById("quizForm");
+questions.forEach((q,i)=>{
+    const div = document.createElement("div");
+    div.className="mb-3";
+    div.innerHTML = `<p><b>${i+1}. ${q[0]}</b></p>` + q[1].map((opt,j)=>`
+        <div class="form-check">
+        <input class="form-check-input" type="radio" name="q${i}" id="q${i}${j}" value="${j}">
+        <label class="form-check-label" for="q${i}${j}">${opt}</label>
+        </div>`).join("");
+    quizForm.appendChild(div);
+});
+
+// Result Check
+function checkResult(){
+    const nameVal = document.getElementById("name").value.trim();
+    const rollVal = document.getElementById("roll").value.trim();
+    const deptVal = document.getElementById("dept").value.trim();
+    if(!nameVal || !rollVal || !deptVal){
+        alert("নাম, রোল ও বিভাগ পূরণ করুন।");
+        return;
+    }
+
+    let score=0;
+    questions.forEach((q,i)=>{
+        const ans = document.querySelector(`input[name=q${i}]:checked`);
+        if(ans && parseInt(ans.value)===q[2]) score++;
+    });
+
+    document.getElementById("output").innerHTML = `
+        <div class="alert alert-success result">
+        <b>নাম:</b> ${nameVal}<br>
+        <b>রোল:</b> ${rollVal}<br>
+        <b>বিভাগ:</b> ${deptVal}<br>
+        <b>স্কোর:</b> ${score} / ${questions.length}
+        </div>
+    `;
+
+    // LocalStorage এ সংরক্ষণ
+    let results = JSON.parse(localStorage.getItem("quizResults")||"[]");
+    results.push({name:nameVal, roll:rollVal, dept:deptVal, score});
+    localStorage.setItem("quizResults", JSON.stringify(results));
+}
+
+// Admin Panel দেখানো
+function showAdminPanel(){
+    const results = JSON.parse(localStorage.getItem("quizResults")||"[]");
+    if(results.length===0){
+        document.getElementById("admin").innerHTML="<div class='alert alert-info'>কোনো রেজাল্ট নেই।</div>";
+        return;
+    }
+    let table = `<h2>Admin Panel - All Results</h2>
+    <table class="table table-bordered table-striped admin-table">
+    <thead class="table-dark">
+        <tr>
+        <th>নাম</th><th>রোল</th><th>বিভাগ</th><th>স্কোর</th>
+        </tr>
+    </thead>
+    <tbody>`;
+    results.forEach(r=>{
+        table += `<tr><td>${r.name}</td><td>${r.roll}</td><td>${r.dept}</td><td>${r.score}</td></tr>`;
+    });
+    table += "</tbody></table>";
+    document.getElementById("admin").innerHTML = table;
+}
+</script>
+</body>
+</html>
